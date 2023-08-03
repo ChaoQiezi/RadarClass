@@ -1,0 +1,6 @@
+# root directory of the project
+
+root_dir: D:\PyProJect\RadarClass
+
+radar_vv_dir: E:\DATA\RadarSentinelClass\VV
+radar_vh_dir: E:\DATA\RadarSentinelClass\VH

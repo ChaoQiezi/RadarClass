@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/RadarClass.iml" filepath="$PROJECT_DIR$/.idea/RadarClass.iml" />
+      <module fileurl="file://E:/资料/Github/Remote-sensing-CNN-land-classify-master/.idea/Remote-sensing-CNN-land-classify-master.iml" filepath="E:/资料/Github/Remote-sensing-CNN-land-classify-master/.idea/Remote-sensing-CNN-land-classify-master.iml" />
+    </modules>
+  </component>
+</project>

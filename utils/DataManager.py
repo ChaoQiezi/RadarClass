@@ -80,5 +80,3 @@ class DataManager:
             train_test_split(features, labels, test_size=test_size, random_state=random_state)
 
         return features_train, features_test, labels_train, labels_test
-
-        

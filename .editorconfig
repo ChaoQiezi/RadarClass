@@ -12,3 +12,4 @@ tab_width = 4
 [{*.yaml,*.yml}]  # this is for .yml files
 indent_size = 2  # 2 spaces indentation
 
+

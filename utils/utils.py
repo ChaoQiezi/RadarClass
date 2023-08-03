@@ -26,3 +26,5 @@ def read_img(img_path):
     del img
 
     return img_data, [img_rows, img_cols, img_nodata, img_transform, img_projection]
+
+

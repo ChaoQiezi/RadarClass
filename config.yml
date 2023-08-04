@@ -9,5 +9,5 @@ labels_path: E:\Material\Object\RadarSentinelClass\Data\Labels\labels.tif
 
 save_dir: D:\PyProJect\RadarClass\data
 
-chip_size: 5
+chip_size: 11
 stride: 1

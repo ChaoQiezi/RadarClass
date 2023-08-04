@@ -18,7 +18,12 @@ from utils.utils import read_img
 class DataManager:
 
     def __init__(self):
-        self.img = None
+        self.img = type('', (), {})()  # create an empty class
+        self.img.nodata = None
+        self.img.rows = None
+        self.img.cols = None
+        self.img.transform = None
+        self.img.projection = None
         self.time_steps = None
 
     def load_data(self, dataset_dir, wildcard='*.tif', save_path=None):
@@ -43,6 +48,7 @@ class DataManager:
 
             # add
             datasets.append(dataset)
+            print('>>> {} is loaded.'.format(os.path.basename(dataset_path)))
         if len(datasets) == 0:
             raise ValueError("There is no {} image in the {}".format(wildcard, dataset_dir))
         # get img info
@@ -65,9 +71,9 @@ class DataManager:
     def nomalize(self, dataset, train_flag=False):
 
         if train_flag:
-            for i in range(dataset.shape[1]):  # dataset.shape = (None, rows, cols, bands)
-                dataset[:, i, :, :] = (dataset[:, i, :, :] - np.nanmin(dataset[:, i, :, :])) \
-                                      / (np.nanmax(dataset[:, i, :, :]) - np.nanmin(dataset[:, i, :, :]))
+            for i in range(dataset.shape[-1]):  # dataset.shape = (None, rows, cols, bands)
+                dataset[:, :, :, i] = (dataset[:, :, :, i] - np.nanmin(dataset[:, :, :, i])) \
+                                      / (np.nanmax(dataset[:, :, :, i]) - np.nanmin(dataset[:, :, :, i]))
         else:
             dataset = (dataset - np.nanmin(dataset)) / (np.nanmax(dataset) - np.nanmin(dataset))
 

@@ -9,6 +9,7 @@ This script is used to save the helpful tools
 import numpy as np
 from skimage.util import view_as_windows
 from osgeo import gdal
+from keras.layers import Reshape
 
 
 def read_img(img_path):
@@ -33,10 +34,9 @@ def read_img(img_path):
 
 
 def make_chips(dataset, window_shape, stride=1):
-    features = view_as_windows(dataset, window_shape, stride)
+    features = np.pad(dataset, ((0, 0), (4, 4), (4, 4), (0, 0)), 'reflect')
+    features = view_as_windows(features, window_shape, stride)
 
-    features = np.squeeze(features)  # shape: (_rows, _cols, time_steps, chip_size, chip_size, bands=2)
-    features = np.reshape(features,
-                          (-1, *features.shape[2:]))  # shape: (n_samples, time_steps, chip_size, chip_size, bands=2)
+    features = np.squeeze(features)  # shape: (rows, cols, time_steps, chip_size, chip_size, bands=2)
 
     return features

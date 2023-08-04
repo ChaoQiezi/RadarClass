@@ -2,5 +2,12 @@
 
 root_dir: D:\PyProJect\RadarClass
 
-radar_vv_dir: E:\DATA\RadarSentinelClass\VV
-radar_vh_dir: E:\DATA\RadarSentinelClass\VH
+radar_vv_dir: E:\Material\Object\RadarSentinelClass\Data\VVs
+radar_vh_dir: E:\Material\Object\RadarSentinelClass\Data\VHs
+
+labels_path: E:\Material\Object\RadarSentinelClass\Data\Labels\labels.tif
+
+save_dir: D:\PyProJect\RadarClass\data
+
+chip_size: 5
+stride: 1

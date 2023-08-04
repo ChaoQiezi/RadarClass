@@ -3,7 +3,7 @@
 # @Email    : chaoqiezi.one@qq.com
 
 """
-This script is used to manage the data
+This script is used to manage the Data
 """
 
 import os
@@ -19,9 +19,9 @@ class DataManager:
 
     def __init__(self):
         self.img = None
+        self.time_steps = None
 
-
-    def get_data(self, dataset_dir, wildcard='*.tif', save_path=None):
+    def load_data(self, dataset_dir, wildcard='*.tif', save_path=None):
         """
 
         :param dataset_dir:
@@ -43,8 +43,10 @@ class DataManager:
 
             # add
             datasets.append(dataset)
-
+        if len(datasets) == 0:
+            raise ValueError("There is no {} image in the {}".format(wildcard, dataset_dir))
         # get img info
+        self.time_steps = len(datasets)
         self.img.rows = img_info[0]
         self.img.cols = img_info[1]
         self.img.transform = img_info[3]
@@ -57,18 +59,15 @@ class DataManager:
 
         return datasets
 
-
-    def make_chips(self, dataset, chip_size, Nodata=None):
-
-        chips = imageChipsFromArray(dataset, chip_size, chip_size)
-
-        return chips
+    def read_img(self, img_path):
+        return read_img(img_path)
 
     def nomalize(self, dataset, train_flag=False):
 
         if train_flag:
-            for i in range(dataset.shape[-1]):  # dataset.shape = (None, rows, cols, bands)
-                dataset[:, :, :, i] = (dataset[:, :, :, i] - np.nanmin(dataset[:, :, :, i])) / (np.nanmax(dataset[:, :, :, i]) - np.nanmin(dataset[:, :, :, i]))
+            for i in range(dataset.shape[1]):  # dataset.shape = (None, rows, cols, bands)
+                dataset[:, i, :, :] = (dataset[:, i, :, :] - np.nanmin(dataset[:, i, :, :])) \
+                                      / (np.nanmax(dataset[:, i, :, :]) - np.nanmin(dataset[:, i, :, :]))
         else:
             dataset = (dataset - np.nanmin(dataset)) / (np.nanmax(dataset) - np.nanmin(dataset))
 

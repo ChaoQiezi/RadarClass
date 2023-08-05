@@ -42,5 +42,13 @@ features_labels = {
     'labels_train': labels_train,
     'labels_test': labels_test
 }
-save_path = os.path.join(config['save_dir'], 'features_labels.npy')
-np.save(save_path, features_labels)
+# save as h5
+with open(os.path.join(config['save_dir'], 'features_labels.h5'), 'w') as f:
+    for key, value in features_labels.items():
+        f.create_dataset(key, data=value)
+# save path to config file
+config['features_labels_path'] = os.path.join(config['save_dir'], 'features_labels.h5')
+
+# generate the train data and test dataset by batch
+partition = {'train': [1, 1, 1, 1, 2], 'test': [3, 4]}
+labels = {}

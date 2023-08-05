@@ -14,7 +14,6 @@ import keras.utils
 import numpy as np
 from keras.utils import Sequence
 from sklearn.model_selection import train_test_split
-
 from utils.utils import read_img
 
 
@@ -92,10 +91,9 @@ class DataManager:
 
 class GenerateData(Sequence):
 
-    def __init__(self, n_samples: int, config, is_train: bool, batch_size=32, dimension=(30, 11, 11), channels=2,
-                 n_class=10, shuffle=True):
+    def __init__(self, config: dict, is_train: bool, batch_size=512, dimension=(30, 11, 11), channels=2,
+                 n_class=None, shuffle=True):
 
-        self.n_samples = n_samples
         self.config = config
         self.is_train = is_train
         self.batch_size = batch_size
@@ -103,6 +101,10 @@ class GenerateData(Sequence):
         self.channels = channels
         self.n_class = n_class
         self.shuffle = shuffle
+        if self.is_train:
+            self.n_samples = self.config['train_samples']
+        else:
+            self.n_samples = self.config['test_samples']
         self.on_epoch_end()  # on_epoch_end() means that the function will be executed after each epoch
 
     def __len__(self):
@@ -123,6 +125,8 @@ class GenerateData(Sequence):
             np.random.shuffle(self.epoch_indexes)
 
     def __data_generation(self, batch_indexes: list):
+        # because reading an h5 file through  the indexes  requires that the indexes are in increasing order
+        batch_indexes.sort()
         # open h5 file
         with h5py.File(self.config['features_labels_path'], 'r') as f:
             if self.is_train:
@@ -132,5 +136,6 @@ class GenerateData(Sequence):
             else:
                 features = f['features_test'][batch_indexes, :, :, :, :]
                 labels = f['labels_test'][batch_indexes]
-
+        if self.n_class is None:
+            self.n_class = len(np.unique(labels))
         return features, keras.utils.to_categorical(labels, num_classes=self.n_class)  # one-hot encoding

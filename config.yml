@@ -1,8 +1,10 @@
+bands: 2
 chip_size: 11
 features_labels_path: E:\Material\Object\RadarSentinelClass\Data\features_labels.h5
 features_path: E:\Material\Object\RadarSentinelClass\Data\features.h5
 labels_path: E:\Material\Object\RadarSentinelClass\Data\Labels\labels.tif
 model_path: E:\Material\Object\RadarSentinelClass\Data\cnn.h5
+model_weight_path: E:\Material\Object\RadarSentinelClass\Data\cnn_weight.h5
 original_features: E:\Material\Object\RadarSentinelClass\Data\original_features.h5
 radar_vh_dir: E:\Material\Object\RadarSentinelClass\Data\VHs
 radar_vv_dir: E:\Material\Object\RadarSentinelClass\Data\VVs
@@ -10,7 +12,6 @@ root_dir: D:\PyProJect\RadarClass
 save_dir: E:\Material\Object\RadarSentinelClass\Data
 stride: 1
 test_samples: 62347
-train_samples: 249385
 time_steps: 30
-bands: 2
+train_samples: 249385
 yours: me

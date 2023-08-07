@@ -10,10 +10,11 @@ import os
 import glob
 
 import h5py
-import keras.utils
 import numpy as np
+import keras
 from keras.utils import Sequence
 from sklearn.model_selection import train_test_split
+from skimage.util import view_as_windows
 from utils.utils import read_img
 
 
@@ -138,5 +139,41 @@ class GenerateData(Sequence):
                 labels = f['labels_test'][batch_indexes]
         if self.n_class is None:
             self.n_class = len(np.unique(labels))
-        # return features, keras.utils.to_categorical(labels, num_classes=self.n_class)  # one-hot encoding
-        return features, labels
+        return features, keras.utils.to_categorical(labels, num_classes=self.n_class)  # one-hot encoding
+
+
+class PredictGenerator(Sequence):
+
+    def __init__(self, predict_data_path):
+        self.predict_data_path = predict_data_path
+        with h5py.File(self.predict_data_path, 'r') as f:
+            self.rows = range(5, f['features'].shape[1] - 5)
+
+    def __len__(self):
+        # return len(self.rows)
+        return 20
+
+    def __getitem__(self, index):
+        row = self.rows[index]
+        return self.__data_generation(row)
+
+    def __data_generation(self, row):
+        with h5py.File(self.predict_data_path, 'r') as f:
+            predict_data = f['features'][:]
+            predict_data = view_as_windows((predict_data[:, row - 5:row + 6, :, :]), (30, 11, 11, 2)).squeeze()
+        return predict_data
+
+
+class PredictGenerator2(Sequence):
+
+    def __init__(self, predict_data):
+        self.predict_data = predict_data
+        self.rows = range(5, predict_data.shape[1] - 5)
+
+    def __len__(self):
+        # return len(self.rows)
+        return 10
+
+    def __getitem__(self, index):
+        row = self.rows[index]
+        return view_as_windows((self.predict_data[:, row - 5:row + 6, :, :]), (30, 11, 11, 2)).squeeze()

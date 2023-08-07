@@ -47,3 +47,4 @@ def make_chips(dataset, window_shape, stride=1):
 def update_config(config):
     with open('config.yml', 'w') as f:
         yaml.safe_dump(config, f)
+

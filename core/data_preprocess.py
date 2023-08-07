@@ -27,6 +27,15 @@ labels, labels_info = data_manager.read_img(config['labels_path'])  # shape: (ro
 features = np.stack((radar_vvs, radar_vhs), axis=-1)  # shape: (time_steps, rows, cols, bands=2)
 del radar_vvs, radar_vhs  # release the memory
 features = data_manager.nomalize(features, train_flag=True)
+# save the original features
+config['original_features'] = os.path.join(config['save_dir'], 'original_features.h5')
+with h5py.File(config['original_features'], 'w') as f:
+    # default window size is 11 * 11
+    padding_size = config['chip_size'] // 2
+    f.create_dataset(
+        'features', data=np.pad(features, ((0, 0), (padding_size, padding_size), (padding_size, padding_size),
+                                           (0, 0)), 'reflect'), dtype=np.float32)
+# make chips
 features = make_chips(features, (data_manager.time_steps, config['chip_size'], config['chip_size'], 2),
                       config['stride'])  # features shape: (rows, cols, time_steps, chip_size, chip_size, bands=2)
 # discard the invalid samples based on the labels
@@ -50,4 +59,6 @@ with h5py.File(config['features_labels_path'], 'w') as f:
         f.create_dataset(key, data=value)
 config['train_samples'] = features_labels['features_train'].shape[0]
 config['test_samples'] = features_labels['features_test'].shape[0]
+config['time_steps'] = features_labels['features_train'].shape[1]
+config['bands'] = 2
 update_config(config)

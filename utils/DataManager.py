@@ -138,4 +138,5 @@ class GenerateData(Sequence):
                 labels = f['labels_test'][batch_indexes]
         if self.n_class is None:
             self.n_class = len(np.unique(labels))
-        return features, keras.utils.to_categorical(labels, num_classes=self.n_class)  # one-hot encoding
+        # return features, keras.utils.to_categorical(labels, num_classes=self.n_class)  # one-hot encoding
+        return features, labels

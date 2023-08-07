@@ -7,7 +7,7 @@ This script is used to build the model
 """
 
 import keras
-from keras.layers import Conv2D, Dropout, Flatten, Dense, BatchNormalization, Conv3D, Activation
+from keras.layers import Conv2D, Dropout, Flatten, Dense, BatchNormalization, Conv3D, Activation, ConvLSTM2D
 from keras.optimizers import Adam
 import matplotlib.pyplot as plt
 
@@ -74,21 +74,25 @@ def cnn3d():
     """input_shape: (batch_size, time_steps, rows, cols, channels)"""
     model.add(BatchNormalization())
     model.add(Activation('relu'))
+    model.add(Dropout(0.25))  # default dropout 25% of the nodes(or convolution kernel) randomly
 
     # 64@3*3*3
     model.add(Conv3D(64, kernel_size=(3, 3, 3)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
+    model.add(Dropout(0.25))
 
     # 128@3*3*3
     model.add(Conv3D(128, kernel_size=(3, 3, 3)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
+    model.add(Dropout(0.25))
 
     # 256@3*3
     model.add(Conv2D(256, kernel_size=(3, 3)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
+    model.add(Dropout(0.25))
 
     # Flatten
     model.add(Flatten())
@@ -102,7 +106,37 @@ def cnn3d():
 
     # compile model
     adam = Adam(learning_rate=0.0005)
-    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    model.compile(loss='sparse_categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+
+    return model
+
+
+def lstm2d():
+    pass
+
+
+def build_cnn_lstm(input_shape, class_num, dropout_rate=0.25, activation='relu'):
+    """
+    this function us used to build the lstm model
+    :param input_shape: the shape of the input features(single image chips) ==> (time_step, height, width, channel)
+    :param class_num: the number of the classes
+    :param dropout_rate: the dropout rate of the neurons(every hidden convolutional layer is both done)
+    :param activation: the activation function of every hidden layer
+    :return: the lstm model
+    """
+
+    model = keras.Sequential()  # create a sequential model
+    model.add(ConvLSTM2D(64, strides=1, kernel_size=3, padding='valid', activation=activation, return_sequences=True,
+                         input_shape=input_shape))  # add the convolutional layers of the model,Out=(None, 12, 3, 3, 32)
+    model.add(Dropout(dropout_rate))  # default dropout 25% of the nodes
+    model.add(ConvLSTM2D(128, strides=1, kernel_size=3, padding='valid', activation=activation))  # Out=(None, 1, 1, 64)
+    model.add(Dropout(dropout_rate))
+    model.add(Conv2D(128, strides=1, kernel_size=1, padding='valid', activation=activation))  # Out=(None, 1, 1, 64)
+    model.add(Dropout(dropout_rate))
+    model.add(Flatten())  # flatten the input
+    model.add(Dense(256, activation=activation))  # add the fully connected layers of the model
+    model.add(Dense(64, activation=activation))
+    model.add(Dense(class_num, activation='softmax'))  # add the output layer of the model
 
     return model
 

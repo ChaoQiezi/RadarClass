@@ -6,9 +6,11 @@
 This script is used to ...
 """
 
+import os
 import yaml
 from utils.DataManager import GenerateData
 from utils.model import cnn3d
+from utils.utils import update_config
 
 # load the config file
 config = yaml.load(open('config.yml', 'r'), Loader=yaml.FullLoader)
@@ -18,8 +20,16 @@ training_generator = GenerateData(config, True)
 
 # build the model
 cnn = cnn3d()
+print(cnn.summary())
 
 # train model on dataset
-history = cnn.fit_generator(generator=training_generator, use_multiprocessing=True, workers=12)
+history = cnn.fit(x=training_generator, use_multiprocessing=True, workers=12)
 # print and view the history
-print(history.history)
+print(cnn.history.history)
+
+# save the model
+config['model_path'] = os.path.join(config['save_dir'], 'cnn.h5')
+cnn.save(config['model_path'])
+
+# save the config
+update_config(config)

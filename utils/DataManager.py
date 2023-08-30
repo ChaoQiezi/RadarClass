@@ -8,7 +8,6 @@ This script is used to manage the Data
 
 import os
 import glob
-
 import h5py
 import numpy as np
 import keras
@@ -20,7 +19,8 @@ from utils.utils import read_img
 
 class DataManager:
 
-    def __init__(self):
+    def __init__(self, config):
+        self.config = config
         self.img = type('', (), {})()  # create an empty class
         self.img.nodata = None
         self.img.rows = None
@@ -82,6 +82,33 @@ class DataManager:
 
         return dataset
 
+    def balance_data(self, features, labels):
+        class_label = np.unique(labels)
+        class_amount = {label: np.sum(labels == label) for label in class_label}
+        min_amount = np.min(list(class_amount.values()))
+
+        for label in class_label:
+            if class_amount[label] > min_amount:
+                mask = labels == label
+                mask = np.random.choice(mask, min_amount, replace=False)
+                labels = labels[mask]
+                features = features[mask, :, :, :, :]
+
+        return features, labels
+
+    def extract_weight(self, labels):
+        class_label = np.unique(labels)
+        class_amount = {int(label): int(np.sum(labels == label)) for label in class_label}
+        class_amount_sum = np.sum(list(class_amount.values()))
+
+        class_weight = {int(label): float(label_amount / class_amount_sum * 10) for label, label_amount in
+                        class_amount.items()}
+
+        # # discard the count of nodata
+        # class_weight.pop(self.config['geo_info'][2])
+
+        return class_weight
+
     def split_data(self, features, labels, test_size=0.2, random_state=0):
 
         features_train, features_test, labels_train, labels_test = \
@@ -92,15 +119,13 @@ class DataManager:
 
 class GenerateData(Sequence):
 
-    def __init__(self, config: dict, is_train: bool, batch_size=512, dimension=(30, 11, 11), channels=2,
-                 n_class=None, shuffle=True):
+    def __init__(self, config: dict, is_train: bool, batch_size=512, shuffle=True):
 
         self.config = config
         self.is_train = is_train
         self.batch_size = batch_size
-        self.dimension = dimension
-        self.channels = channels
-        self.n_class = n_class
+        self.channels = config['bands']
+        self.n_class = config['n_class']
         self.shuffle = shuffle
         if self.is_train:
             self.n_samples = self.config['train_samples']
@@ -110,6 +135,7 @@ class GenerateData(Sequence):
 
     def __len__(self):
         return self.n_samples // self.batch_size  # get the number of batches per epoch
+        # return 100
 
     def __getitem__(self, index):
         # generate indexes of the batch
@@ -117,7 +143,6 @@ class GenerateData(Sequence):
 
         # generate data
         features, labels = self.__data_generation(batch_indexes)
-
         return features, labels
 
     def on_epoch_end(self):
@@ -126,7 +151,7 @@ class GenerateData(Sequence):
             np.random.shuffle(self.epoch_indexes)
 
     def __data_generation(self, batch_indexes: list):
-        # because reading an h5 file through  the indexes  requires that the indexes are in increasing order
+        # because reading a h5 file through  the indexes  requires that the indexes are in increasing order
         batch_indexes.sort()
         # open h5 file
         with h5py.File(self.config['features_labels_path'], 'r') as f:
@@ -137,9 +162,9 @@ class GenerateData(Sequence):
             else:
                 features = f['features_test'][batch_indexes, :, :, :, :]
                 labels = f['labels_test'][batch_indexes]
-        if self.n_class is None:
-            self.n_class = len(np.unique(labels))
+            # labels -= 1  # for the moment
         return features, keras.utils.to_categorical(labels, num_classes=self.n_class)  # one-hot encoding
+        # return features, labels
 
 
 class PredictGenerator(Sequence):
@@ -163,17 +188,16 @@ class PredictGenerator(Sequence):
             predict_data = view_as_windows((predict_data[:, row - 5:row + 6, :, :]), (30, 11, 11, 2)).squeeze()
         return predict_data
 
-
-class PredictGenerator2(Sequence):
-
-    def __init__(self, predict_data):
-        self.predict_data = predict_data
-        self.rows = range(5, predict_data.shape[1] - 5)
-
-    def __len__(self):
-        # return len(self.rows)
-        return 10
-
-    def __getitem__(self, index):
-        row = self.rows[index]
-        return view_as_windows((self.predict_data[:, row - 5:row + 6, :, :]), (30, 11, 11, 2)).squeeze()
+# class PredictGenerator2(Sequence):
+#
+#     def __init__(self, predict_data):
+#         self.predict_data = predict_data
+#         self.rows = range(5, predict_data.shape[1] - 5)
+#
+#     def __len__(self):
+#         # return len(self.rows)
+#         return 10
+#
+#     def __getitem__(self, index):
+#         row = self.rows[index]
+#         return view_as_windows((self.predict_data[:, row - 5:row + 6, :, :]), (30, 11, 11, 2)).squeeze()

@@ -1,17 +1,38 @@
 bands: 2
 chip_size: 11
+class_weight:
+  0: 4.046751980116251
+  1: 3.713180062765949
+  2: 0.5147122440793148
+  3: 0.8041592273024013
+  4: 0.6205019702844917
+  5: 0.3006945154515923
 features_labels_path: E:\Material\Object\RadarSentinelClass\Data\features_labels.h5
 features_path: E:\Material\Object\RadarSentinelClass\Data\features.h5
-labels_path: E:\Material\Object\RadarSentinelClass\Data\Labels\labels.tif
-model_path: E:\Material\Object\RadarSentinelClass\Data\cnn.h5
-model_weight_path: E:\Material\Object\RadarSentinelClass\Data\cnn_weight.h5
+geo_info:
+  - 10243
+  - 11500
+  - 15.0
+  - !!python/tuple
+    - 125.329786869668
+    - 8.982420697809161e-05
+    - 0.0
+    - 46.4261911721426
+    - 0.0
+    - -8.982420697809189e-05
+  - GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]
+history_path: E:\Material\Object\RadarSentinelClass\Data\history_compound_with_focal.xlsx
+labels_path: E:\Material\Object\RadarSentinelClass\Data\Labels\__labels.tif
+labels_predict_path: E:\Material\Object\RadarSentinelClass\Data\labels_predict_compound_with_focal.tif
+model_path: E:\Material\Object\RadarSentinelClass\Data\compound_with_focal.h5
+model_weight_path: E:\Material\Object\RadarSentinelClass\Data\compound_weight_with_focal.h5
+n_class: 6
 original_features: E:\Material\Object\RadarSentinelClass\Data\original_features.h5
 radar_vh_dir: E:\Material\Object\RadarSentinelClass\Data\VHs
 radar_vv_dir: E:\Material\Object\RadarSentinelClass\Data\VVs
 root_dir: D:\PyProJect\RadarClass
 save_dir: E:\Material\Object\RadarSentinelClass\Data
 stride: 1
-test_samples: 62347
+test_samples: 25428
 time_steps: 30
-train_samples: 249385
-yours: me
+train_samples: 101711
